@@ -20,7 +20,11 @@ to recognise Slackware and to read /run/host/os-release inside a Flatpak.
 2. Build and install as root:
 
      ./google-endpoint-verification.SlackBuild
-     installpkg /tmp/google-endpoint-verification-*_SBo.tgz
+     upgradepkg --install-new /tmp/google-endpoint-verification-*_SBo.tgz
+
+   upgradepkg installs the package the first time and replaces an older
+   build (same version, lower BUILD) cleanly; installpkg would leave two
+   package entries.
 
 3. Startup (nothing is done automatically). Add this to /etc/rc.d/rc.local,
    which must be executable, and run the same lines once as root now:
