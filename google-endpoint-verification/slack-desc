@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.
+# Line up the first '|' above the ':' following the base package name, and
+# the '|' on the right side marks the last column you can put a character in.
+# You must make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':' except on otherwise blank lines.
+
+                            |-----handy-ruler------------------------------------------------------|
+google-endpoint-verification: google-endpoint-verification (Endpoint Verification helper)
+google-endpoint-verification:
+google-endpoint-verification: Native messaging helper of Google's Endpoint Verification Chrome
+google-endpoint-verification: extension. It reports device attributes (serial number, disk
+google-endpoint-verification: encryption, OS version, ...) to the Google Workspace admin
+google-endpoint-verification: console.
+google-endpoint-verification:
+google-endpoint-verification: Repackages Google's Debian binary into /opt. Includes
+google-endpoint-verification: ev-flatpak-setup to wire it to a Flatpak Google Chrome.
+google-endpoint-verification:
+google-endpoint-verification: Homepage: https://support.google.com/a/users/answer/9018161

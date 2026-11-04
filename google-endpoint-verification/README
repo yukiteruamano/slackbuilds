@@ -1,0 +1,59 @@
+Endpoint Verification is the native helper that lets Google's Endpoint
+Verification Chrome extension report device attributes (serial number,
+disk encryption, OS version, hostname, ...) to the Google Workspace
+admin console.
+
+This slackbuild repackages Google's Debian binary (it is proprietary and
+is not redistributed here) and installs it, like upstream, under
+/opt/google/endpoint-verification. The init script, systemd unit and
+maintainer scripts of the .deb are not used. device_state.sh is patched
+to recognise Slackware and to read /run/host/os-release inside a Flatpak.
+
+1. Download the .deb into this directory; the helper checks its sha256
+   and discards the file if it does not match:
+
+     ./download-deb.sh
+
+   By hand it is endpoint-verification_1765828494702-842239260_amd64.deb,
+   from the DOWNLOAD_x86_64 url of the .info file.
+
+2. Build and install as root:
+
+     ./google-endpoint-verification.SlackBuild
+     installpkg /tmp/google-endpoint-verification-*_SBo.tgz
+
+3. Startup (nothing is done automatically). Add this to /etc/rc.d/rc.local,
+   which must be executable, and run the same lines once as root now:
+
+     if [ -x /opt/google/endpoint-verification/bin/device_state.sh ]; then
+       /opt/google/endpoint-verification/bin/device_state.sh init > /opt/google/endpoint-verification/var/lib/device_attrs
+     fi
+
+   It stores the serial number and disk encryption state, which need root.
+
+4. Flatpak Google Chrome, as your normal user (not root):
+
+     /opt/google/endpoint-verification/bin/ev-flatpak-setup
+     flatpak override --user --filesystem=/opt/google/endpoint-verification:ro com.google.Chrome
+
+   Restart Chrome, install the Endpoint Verification extension from the
+   Chrome Web Store and click "Sync Now".
+
+   If Chrome cannot start the helper, retry with the fallback, which runs
+   it on the host through flatpak-spawn. It needs the broad permission
+   org.freedesktop.Flatpak, which lets Chrome run commands on the host:
+
+     /opt/google/endpoint-verification/bin/ev-flatpak-setup --spawn
+     flatpak override --user --talk-name=org.freedesktop.Flatpak com.google.Chrome
+
+   To undo: ev-flatpak-setup --remove, then flatpak override --user --reset
+   com.google.Chrome.
+
+Notes:
+- Google only supports Debian and Ubuntu. On Slackware os_firewall (ufw only)
+  is empty and screen_lock_secured (GNOME/Cinnamon only) is UNKNOWN. os_version
+  is the real VERSION_ID of /etc/os-release. Upstream aborts when ufw.conf
+  is missing; the patch makes those values empty instead.
+- device_state.sh uses absolute tool paths; the build warns about any missing.
+- removepkg does not delete /opt/google/endpoint-verification/var/lib/device_attrs
+  nor the per-user files; remove them by hand.
