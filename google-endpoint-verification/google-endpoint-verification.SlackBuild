@@ -110,6 +110,7 @@ cp -a usr/lib/mozilla/native-messaging-hosts/*.json \
 # - Flatpak bind-mounts the host os-release at /run/host/os-release.
 # - The script runs with "set -u" and dies at the first printf of a value it
 #   could not collect (no ufw.conf, unreadable serial), so default them.
+# - Slackware ships udevadm in /sbin, not /bin.
 STATE=$INST/bin/device_state.sh
 echo "$STATE_SHA256  $STATE" | sha256sum -c -
 chmod 755 "$STATE"
@@ -117,10 +118,13 @@ sed -i \
   -e '/^  OS_INFO_FILE=\/etc\/os-release$/a\  if [ -r /run/host/os-release ]; then\n    OS_INFO_FILE=/run/host/os-release\n  fi' \
   -e 's/\*ubuntu\*|\*debian\*)/*ubuntu*|*debian*|*slackware*)/' \
   -e '/^ACTION=\${1:-default}$/a\SERIAL_NUMBER=\nOS_VERSION=\nOS_FIREWALL=\nMODEL=\nMAC_ADDRESSES=' \
+  -e 's|^UDEVADM=/bin/udevadm$|UDEVADM=/sbin/udevadm|' \
   "$STATE"
 grep -q 'run/host/os-release' "$STATE"
 grep -q '\*slackware\*' "$STATE"
 grep -q '^OS_FIREWALL=$' "$STATE"
+grep -q '^MAC_ADDRESSES=$' "$STATE"
+grep -q '^UDEVADM=/sbin/udevadm$' "$STATE"
 sh -n "$STATE"
 
 # The script hardcodes absolute tool paths; warn about any missing here.
